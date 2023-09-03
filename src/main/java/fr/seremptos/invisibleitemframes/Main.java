@@ -36,15 +36,16 @@ public final class Main extends JavaPlugin {
             ItemStack iframe = iframe_nbt.getItem();
             iframe.editMeta(meta -> meta.displayName(MiniMessage.miniMessage().deserialize("<lang:"+ frame.translationKey()+ "> invisible").decoration(TextDecoration.ITALIC, false)));
 
-            ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(this, "invisible_"+frame.getType()), iframe);
+            NamespacedKey key = new NamespacedKey(this, "invisible_"+frame.getType());
+            ShapedRecipe recipe = new ShapedRecipe(key, iframe);
             recipe.shape(" M ", "MIM", " M ");
             recipe.setIngredient('M', Material.PHANTOM_MEMBRANE);
             recipe.setIngredient('I', frame.getType());
 
             if (Bukkit.addRecipe(recipe)) {
-                getLogger().info("Recette ajoutée avec succès !");
+                getLogger().info("Recette ajoutée avec succès ! ("+key.asString()+")");
             } else {
-                getLogger().warning("La recette n'a pas pu être ajoutée !");
+                getLogger().warning("La recette n'a pas pu être ajoutée ! ("+key.asString()+")");
             }
         }
     }
