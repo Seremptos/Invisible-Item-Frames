@@ -1,0 +1,6 @@
+name: InvisibleItemFrames
+version: 1.0
+main: fr.seremptos.invisibleitemframes.Main
+api-version: '1.19'
+authors: [Seremptos]
+description: AThis plugin adds a way to craft invisible item frames in survival.
