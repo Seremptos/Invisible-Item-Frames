@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void onCraft(PrepareItemCraftEvent event) {
+        if(event.getInventory().getMatrix().length != 9) return; // On check si on est bien dans un établi.
         ItemStack item = event.getInventory().getMatrix()[4];
         if(item == null) return;
 
