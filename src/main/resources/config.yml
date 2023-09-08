@@ -1,0 +1,2 @@
+# Override the item frame drop for invisible frames (fixes https://bugs.mojang.com/browse/MC-190519)
+override-item-frame-drop: true
