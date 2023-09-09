@@ -52,7 +52,8 @@ public final class Main extends JavaPlugin {
                     .toCharArray();
 
             for (char character: recipeMaterials) {
-                recipe.setIngredient(character, Material.matchMaterial(getConfig().getString("recipe."+character)));
+                String material = getConfig().getString("recipe."+character);
+                recipe.setIngredient(character, material.equalsIgnoreCase("IFRAME") ? frame : Material.matchMaterial(material));
             }
 
             if (Bukkit.addRecipe(recipe)) {
