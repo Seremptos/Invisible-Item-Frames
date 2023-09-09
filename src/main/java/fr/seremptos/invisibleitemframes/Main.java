@@ -8,9 +8,13 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class Main extends JavaPlugin {
 
@@ -31,10 +35,25 @@ public final class Main extends JavaPlugin {
     public void addInvisibleItemFrameRecipe() {
         for(Material frame : frames) {
             NamespacedKey key = new NamespacedKey(this, "invisible_"+frame);
-            ShapedRecipe recipe = new ShapedRecipe(key, getInvisibleFrame(new ItemStack(frame)));
-            recipe.shape(" M ", "MIM", " M ");
-            recipe.setIngredient('M', Material.PHANTOM_MEMBRANE);
-            recipe.setIngredient('I', frame);
+            ShapedRecipe recipe = new ShapedRecipe(key, getInvisibleFrame(this, new ItemStack(frame)));
+            String[] shape = new String[]{
+                    getConfig().getString("recipe.first-row", " M "),
+                    getConfig().getString("recipe.second-row", "MIM"),
+                    getConfig().getString("recipe.third-row", " M ")
+            };
+
+            recipe.shape(shape);
+
+            char[] recipeMaterials = Arrays.stream(shape)
+                    .distinct()
+                    .collect(Collectors.joining())
+                    .strip()
+                    .replace(" ", "")
+                    .toCharArray();
+
+            for (char character: recipeMaterials) {
+                recipe.setIngredient(character, Material.matchMaterial(getConfig().getString("recipe."+character)));
+            }
 
             if (Bukkit.addRecipe(recipe)) {
                 getLogger().info("Recette ajoutée avec succès ! ("+key.asString()+")");
@@ -44,11 +63,11 @@ public final class Main extends JavaPlugin {
         }
     }
 
-    public static ItemStack getInvisibleFrame(ItemStack frame) {
+    public static ItemStack getInvisibleFrame(Plugin plugin, ItemStack frame) {
         NBTItem iframe_nbt = new NBTItem(frame);
         iframe_nbt.addCompound("EntityTag").setBoolean("Invisible", true);
         ItemStack iframe = iframe_nbt.getItem();
-        iframe.editMeta(meta -> meta.displayName(MiniMessage.miniMessage().deserialize("<lang:"+ frame.translationKey()+ "> invisible").decoration(TextDecoration.ITALIC, false)));
+        iframe.editMeta(meta -> meta.displayName(MiniMessage.miniMessage().deserialize(plugin.getConfig().getString("item-name", "%name% invisible").replace("%name%", "<lang:"+ frame.translationKey()+ ">")).decoration(TextDecoration.ITALIC, false)));
         return iframe;
     }
 }

@@ -11,14 +11,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 
 public class Listener implements org.bukkit.event.Listener {
 
-    private Main main;
+    private final Plugin plugin;
 
-    public Listener(Main main) {
-        this.main = main;
+    public Listener(Plugin plugin) {
+        this.plugin = plugin;
     }
 
 
@@ -39,12 +40,13 @@ public class Listener implements org.bukkit.event.Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onHit(HangingBreakEvent event) {
-        if (!event.isCancelled() && event.getEntity() instanceof ItemFrame itemFrame && main.getConfig().getBoolean("override-item-frame-drop", true)) {
+        if (!event.isCancelled() && event.getEntity() instanceof ItemFrame itemFrame && plugin.getConfig().getBoolean("override-item-frame-drop", true)) {
             event.setCancelled(true);
             NBTEntity nbt = new NBTEntity(itemFrame);
             Location loc = event.getEntity().getLocation();
             if (nbt.hasTag("Invisible")) {
                 loc.getWorld().dropItem(loc, Main.getInvisibleFrame(
+                        plugin,
                         new ItemStack(Material.matchMaterial(event.getEntity().getType().toString())))
                 );
             }

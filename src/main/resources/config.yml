@@ -1,2 +1,17 @@
 # Override the item frame drop for invisible frames (fixes https://bugs.mojang.com/browse/MC-190519)
 override-item-frame-drop: true
+
+# Define the recipe for invisible item frames (IFRAME should be used
+# to define the original frame)
+# You need to define the Material of the item used for the craft
+recipe:
+  I: IFRAME
+  M: PHANTOM_MEMBRANE
+  first-row:  " M "
+  second-row: "MIM"
+  third-row:  " M "
+
+# The name of the invisible item frame (%name% replaced by the original item name)
+# Compatible with minimessage colors (<blue>)
+item-name: "%name% invisible"
+
