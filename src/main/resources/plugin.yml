@@ -1,5 +1,5 @@
 name: InvisibleItemFrames
-version: 1.0
+version: 1.3
 main: fr.seremptos.invisibleitemframes.Main
 api-version: '26.1.2'
 authors: [Seremptos]
