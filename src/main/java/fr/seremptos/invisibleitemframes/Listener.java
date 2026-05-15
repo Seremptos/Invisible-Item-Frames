@@ -1,8 +1,7 @@
 package fr.seremptos.invisibleitemframes;
 
-import de.tr7zw.nbtapi.NBTCompound;
-import de.tr7zw.nbtapi.NBTEntity;
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ItemFrame;
@@ -30,11 +29,12 @@ public class Listener implements org.bukkit.event.Listener {
         if(item == null) return;
 
         if(Main.frames.contains(item.getType())){
-            NBTItem nbt = new NBTItem(item);
-            NBTCompound coupound = nbt.getCompound("EntityTag");
-            if(coupound != null && coupound.hasTag("Invisible")) {
-                event.getInventory().setResult(null);
-            }
+            NBT.getComponents(item, nbt -> {
+                ReadableNBT entity_data = nbt.getCompound(Main.ENTITY_DATA);
+                if(entity_data != null && entity_data.hasTag(Main.INVISIBLE)) {
+                    event.getInventory().setResult(null);
+                }
+            });
         }
     }
 

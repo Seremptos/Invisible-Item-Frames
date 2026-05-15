@@ -1,6 +1,7 @@
 package fr.seremptos.invisibleitemframes;
 
-import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -12,13 +13,14 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public final class Main extends JavaPlugin {
 
-    public static List<Material> frames = List.of(Material.ITEM_FRAME, Material.GLOW_ITEM_FRAME);
+    public static final List<Material> frames = List.of(Material.ITEM_FRAME, Material.GLOW_ITEM_FRAME);
+    public static final String INVISIBLE = "Invisible";
+    public static final String ENTITY_DATA = NamespacedKey.minecraft("entity_data").asString();
 
 
     @Override
@@ -26,10 +28,6 @@ public final class Main extends JavaPlugin {
         addInvisibleItemFrameRecipe();
         Bukkit.getPluginManager().registerEvents(new Listener(this), this);
         saveDefaultConfig();
-    }
-
-    @Override
-    public void onDisable() {
     }
 
     public void addInvisibleItemFrameRecipe() {
@@ -65,10 +63,18 @@ public final class Main extends JavaPlugin {
     }
 
     public static ItemStack getInvisibleFrame(Plugin plugin, ItemStack frame) {
-        NBTItem iframe_nbt = new NBTItem(frame);
-        iframe_nbt.addCompound("EntityTag").setBoolean("Invisible", true);
-        ItemStack iframe = iframe_nbt.getItem();
-        iframe.editMeta(meta -> meta.displayName(MiniMessage.miniMessage().deserialize(plugin.getConfig().getString("item-name", "%name% invisible").replace("%name%", "<lang:"+ frame.translationKey()+ ">")).decoration(TextDecoration.ITALIC, false)));
-        return iframe;
+        NBT.modifyComponents(frame, nbt -> {
+            ReadWriteNBT entity_data = nbt.getOrCreateCompound(ENTITY_DATA);
+            entity_data.setString("id", frame.getType().getKey().asString());
+            entity_data.setBoolean(INVISIBLE, true);
+        });
+        frame.editMeta(meta -> meta.displayName(
+                MiniMessage.miniMessage().deserialize(
+                        plugin.getConfig()
+                                .getString("item-name", "%name% invisible")
+                                .replace("%name%", "<lang:"+ frame.translationKey()+ ">")
+                ).decoration(TextDecoration.ITALIC, false)
+        ));
+        return frame;
     }
 }
