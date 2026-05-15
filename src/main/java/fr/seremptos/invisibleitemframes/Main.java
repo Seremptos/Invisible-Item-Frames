@@ -50,14 +50,16 @@ public final class Main extends JavaPlugin {
                     .toCharArray();
 
             for (char character: recipeMaterials) {
-                String material = getConfig().getString("recipe."+character);
-                recipe.setIngredient(character, material.equalsIgnoreCase("IFRAME") ? frame : Material.matchMaterial(material));
+                String materialStr = getConfig().getString("recipe."+character, "");
+                Material m = materialStr.equalsIgnoreCase("IFRAME") ? frame : Material.matchMaterial(materialStr);
+                if(m == null) throw new IllegalArgumentException("Can't find the IFRAME in the recipe !");
+                recipe.setIngredient(character, m);
             }
 
             if (Bukkit.addRecipe(recipe)) {
                 getLogger().info("Recette ajoutée avec succès ! ("+key.asString()+")");
             } else {
-                getLogger().warning("La recette n'a pas pu être ajoutée ! ("+key.asString()+")");
+                throw new RuntimeException("La recette n'a pas pu être ajoutée ! ("+key.asString()+")");
             }
         }
     }
