@@ -38,19 +38,26 @@ public class Listener implements org.bukkit.event.Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onHit(HangingBreakEvent event) {
-        if (!event.isCancelled() && event.getEntity() instanceof ItemFrame itemFrame && plugin.getConfig().getBoolean("override-item-frame-drop", true)) {
-            event.setCancelled(true);
-            NBTEntity nbt = new NBTEntity(itemFrame);
-            Location loc = event.getEntity().getLocation();
-            if (nbt.hasTag("Invisible")) {
-                loc.getWorld().dropItem(loc, Main.getInvisibleFrame(
-                        plugin,
-                        new ItemStack(Material.matchMaterial(event.getEntity().getType().toString())))
-                );
-            }
-            itemFrame.remove();
+        if (!event.isCancelled()
+                && event.getEntity() instanceof ItemFrame itemFrame
+                && plugin.getConfig().getBoolean("override-item-frame-drop", true)
+        ) {
+            NBT.get(itemFrame, nbt -> {
+                    if (nbt.getBoolean(Main.INVISIBLE) == true) {
+                        event.setCancelled(true);
+                        Material m = Material.matchMaterial(itemFrame.getType().toString());
+                        itemFrame.remove();
+                        if (m != null) {
+                            Location loc = event.getEntity().getLocation();
+                            loc.getWorld().dropItem(loc, Main.getInvisibleFrame(
+                                    plugin,
+                                    new ItemStack(m))
+                            );
+                    }
+                }
+            });
         }
     }
 }
